@@ -183,5 +183,10 @@ namespace Playlister
                 audioPlayer.Ctlcontrols.play();
             }
         }
+
+        private void PlayLister_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -55,7 +55,7 @@
             this.fToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(981, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(977, 24);
             this.menuStrip1.TabIndex = 5;
             // 
             // fileToolStripMenuItem1
@@ -111,8 +111,9 @@
             // 
             // audioPlayer
             // 
+            this.audioPlayer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.audioPlayer.Enabled = true;
-            this.audioPlayer.Location = new System.Drawing.Point(12, 389);
+            this.audioPlayer.Location = new System.Drawing.Point(0, 398);
             this.audioPlayer.Name = "audioPlayer";
             this.audioPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("audioPlayer.OcxState")));
             this.audioPlayer.Size = new System.Drawing.Size(781, 46);
@@ -121,6 +122,7 @@
             // 
             // Playlist
             // 
+            this.Playlist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.Playlist.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(67)))), ((int)(((byte)(82)))));
             this.Playlist.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Playlist.Font = new System.Drawing.Font("Nirmala UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -136,10 +138,11 @@
             // 
             // FileName
             // 
+            this.FileName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.FileName.AutoSize = true;
             this.FileName.Font = new System.Drawing.Font("Nirmala UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FileName.ForeColor = System.Drawing.Color.White;
-            this.FileName.Location = new System.Drawing.Point(12, 366);
+            this.FileName.Location = new System.Drawing.Point(12, 375);
             this.FileName.Name = "FileName";
             this.FileName.Size = new System.Drawing.Size(75, 20);
             this.FileName.TabIndex = 3;
@@ -147,10 +150,11 @@
             // 
             // lblDuration
             // 
+            this.lblDuration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblDuration.AutoSize = true;
             this.lblDuration.Font = new System.Drawing.Font("Nirmala UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDuration.ForeColor = System.Drawing.Color.White;
-            this.lblDuration.Location = new System.Drawing.Point(679, 366);
+            this.lblDuration.Location = new System.Drawing.Point(676, 375);
             this.lblDuration.Name = "lblDuration";
             this.lblDuration.Size = new System.Drawing.Size(88, 20);
             this.lblDuration.TabIndex = 4;
@@ -163,16 +167,20 @@
             // PlayLister
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(58)))), ((int)(((byte)(75)))));
-            this.ClientSize = new System.Drawing.Size(981, 447);
+            this.ClientSize = new System.Drawing.Size(977, 444);
             this.Controls.Add(this.lblDuration);
             this.Controls.Add(this.FileName);
             this.Controls.Add(this.Playlist);
             this.Controls.Add(this.audioPlayer);
             this.Controls.Add(this.menuStrip1);
             this.Font = new System.Drawing.Font("Nirmala UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "PlayLister";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Playlister";
+            this.Load += new System.EventHandler(this.PlayLister_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.audioPlayer)).EndInit();

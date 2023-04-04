@@ -19,8 +19,6 @@ namespace Playlister
         FolderBrowserDialog browser = new FolderBrowserDialog();
         int currentFile = 0;
 
-        string prevText = "";
-
         public PlayLister()
         {
             InitializeComponent();

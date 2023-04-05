@@ -17,6 +17,7 @@ namespace Playlister
     {
 
         List<string> filteredFiles = new List<string>();
+        private List<TextBox> weightTextBoxes = new List<TextBox>();
         FolderBrowserDialog browser = new FolderBrowserDialog();
         int currentFile = 0;
         private List<int> recentlyPlayed = new List<int>();
@@ -70,10 +71,22 @@ namespace Playlister
 
             audioPlayer.currentPlaylist = audioPlayer.newPlaylist("Playlist", "");
 
+            int i = 0;
+
             foreach (string audio in filteredFiles)
             {
                 audioPlayer.currentPlaylist.appendItem(audioPlayer.newMedia(audio));
                 Playlist.Items.Add(audio);
+
+                TextBox weightTextBox = new TextBox();
+                weightTextBox.Text = "1"; // Set the initial weight to 1
+                weightTextBox.Location = new Point(Playlist.Location.X - Playlist.Width - 10, Playlist.Location.Y + i * (weightTextBox.Height + 2));
+                weightTextBox.TextChanged += WeightTextBox_TextChanged;
+                weightTextBox.Tag = i; // Store the index of the song in the Tag property
+                this.Controls.Add(weightTextBox);
+                weightTextBoxes.Add(weightTextBox);
+
+                i++;
             }
 
             if (filteredFiles.Count > 0)
@@ -90,7 +103,13 @@ namespace Playlister
             }
 
         }
+        private void WeightTextBox_TextChanged(object sender, EventArgs e)
+        {
+            TextBox weightTextBox = (TextBox)sender;
+            int index = (int)weightTextBox.Tag;
 
+            // Update the song weight. You can store the weights in a separate list or use any other method.
+        }
 
         private void PlayFile(string url)
         {
@@ -106,6 +125,35 @@ namespace Playlister
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private int GetNextSongIndex()
+        {
+            // Convert the TextBox values to a list of integers (song weights)
+            List<int> weights = weightTextBoxes.Select(x => int.TryParse(x.Text, out int result) ? result : 0).ToList();
+
+            int totalWeight = weights.Sum();
+            if (totalWeight <= 0)
+            {
+                // If all weights are zero or negative, pick a song randomly
+                return new Random().Next(filteredFiles.Count);
+            }
+
+            int randomWeight = new Random().Next(totalWeight);
+            int currentIndex = 0;
+            int accumulatedWeight = 0;
+
+            for (int i = 0; i < weights.Count; i++)
+            {
+                accumulatedWeight += weights[i];
+                if (randomWeight < accumulatedWeight)
+                {
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            return currentIndex;
         }
 
         private void MediaPlayerStateChangeEvent(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
@@ -124,14 +172,8 @@ namespace Playlister
             }
             else if (e.newState == 8)
             {
-                // Get the next random song
-                Random rand = new Random();
-                int nextFile;
-
-                do
-                {
-                    nextFile = rand.Next(filteredFiles.Count);
-                } while (recentlyPlayed.Contains(nextFile));
+                // Get the next weighted song
+                int nextFile = GetNextSongIndex();
 
                 // Update the list of recently played songs
                 recentlyPlayed.Add(nextFile);

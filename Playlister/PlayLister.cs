@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using System.IO;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Playlister
 {
@@ -17,21 +16,24 @@ namespace Playlister
     {
 
         List<string> filteredFiles = new List<string>();
+        private List<TextBox> weightTextBoxes = new List<TextBox>();
+        private List<int> recentlyPlayed = new List<int>();
+        private List<int> songWeights = new List<int>();
         FolderBrowserDialog browser = new FolderBrowserDialog();
         int currentFile = 0;
-        private List<int> recentlyPlayed = new List<int>();
+        int itemSpacing = 25;
 
         public PlayLister()
         {
             InitializeComponent();
         }
 
-        private void fileToolStripMenuItem_Click(object sender, EventArgs e) // file menu event
+        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void loadFolderToolStripMenuItem_Click(object sender, EventArgs e) // Load Folder Event
+        private void loadFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             audioPlayer.Ctlcontrols.stop();
 
@@ -54,7 +56,7 @@ namespace Playlister
             }
         }
 
-        private void optionsToolStripMenuItem_Click(object sender, EventArgs e) // options menu event
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
@@ -69,11 +71,25 @@ namespace Playlister
         {
 
             audioPlayer.currentPlaylist = audioPlayer.newPlaylist("Playlist", "");
-
+            int i = 0;
             foreach (string audio in filteredFiles)
             {
                 audioPlayer.currentPlaylist.appendItem(audioPlayer.newMedia(audio));
                 Playlist.Items.Add(audio);
+
+                TextBox weightTextBox = new TextBox();
+                weightTextBox.Text = "1";
+                weightTextBox.Size = new Size(30, Playlist.ItemHeight); // Set a fixed size for the TextBox
+                weightTextBox.Location = new Point(5, i * (weightTextBox.Height+itemSpacing-8)); // Add some margin between TextBoxes
+                weightTextBox.Parent = weightPanel;
+                weightTextBox.Font = new Font("Nirmala UI", 7, FontStyle.Bold); // Set the font to Nirmala UI Bold with a size of 7
+                weightTextBox.TextChanged += WeightTextBox_TextChanged;
+                weightTextBox.Tag = i;
+                weightTextBoxes.Add(weightTextBox);
+
+                songWeights.Add(1); // Initialize the song weights list
+
+                i++;
             }
 
             if (filteredFiles.Count > 0)
@@ -83,6 +99,8 @@ namespace Playlister
                 Playlist.SelectedIndex = currentFile;
 
                 PlayFile(Playlist.SelectedItem.ToString());
+
+                ResizeListBox(Playlist);
             }
             else
             {
@@ -91,6 +109,21 @@ namespace Playlister
 
         }
 
+        private void WeightTextBox_TextChanged(object sender, EventArgs e)
+        {
+            TextBox weightTextBox = (TextBox)sender;
+            int index = (int)weightTextBox.Tag;
+
+            if (int.TryParse(weightTextBox.Text, out int weight))
+            {
+                songWeights[index] = weight;
+            }
+            else
+            {
+                MessageBox.Show("Invalid weight value. Please enter a valid integer.");
+                weightTextBox.Text = songWeights[index].ToString();
+            }
+        }
 
         private void PlayFile(string url)
         {
@@ -107,7 +140,30 @@ namespace Playlister
         {
             Close();
         }
+        private int GetNextSongIndex()
+        {
+            int totalWeight = songWeights.Sum();
+            if (totalWeight <= 0)
+            {
+                return new Random().Next(filteredFiles.Count);
+            }
 
+            int randomWeight = new Random().Next(totalWeight);
+            int currentIndex = 0;
+            int accumulatedWeight = 0;
+
+            for (int i = 0; i < songWeights.Count; i++)
+            {
+                accumulatedWeight += songWeights[i];
+                if (randomWeight < accumulatedWeight)
+                {
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            return currentIndex;
+        }
         private void MediaPlayerStateChangeEvent(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
         {
             if (e.newState == 0)
@@ -132,25 +188,16 @@ namespace Playlister
                 {
                     nextFile = rand.Next(filteredFiles.Count);
                 } while (recentlyPlayed.Contains(nextFile));
+                nextFile = GetNextSongIndex();
 
-                // Update the list of recently played songs
-                recentlyPlayed.Add(nextFile);
-                if (recentlyPlayed.Count >= filteredFiles.Count)
-                {
-                    recentlyPlayed.RemoveAt(0);
-                }
-
-                // Update the current media item in the playlist
                 audioPlayer.Ctlcontrols.stop();
                 audioPlayer.currentPlaylist.clear();
                 audioPlayer.currentPlaylist.appendItem(audioPlayer.newMedia(filteredFiles[nextFile]));
 
-                // Update the playlist UI
                 currentFile = nextFile;
                 Playlist.SelectedIndex = currentFile;
                 ShowFileName(FileName);
 
-                // Start playing the new song
                 audioPlayer.Ctlcontrols.play();
             }
             else if (e.newState == 9)
@@ -168,18 +215,14 @@ namespace Playlister
             int index = Playlist.IndexFromPoint(e.Location);
             if (index != ListBox.NoMatches)
             {
-                // Update the current media item in the playlist
                 audioPlayer.Ctlcontrols.stop();
                 audioPlayer.currentPlaylist.clear();
                 audioPlayer.currentPlaylist.appendItem(audioPlayer.newMedia(filteredFiles[index]));
 
-                // Update the current file index
                 currentFile = index;
 
-                // Show the file name
                 ShowFileName(FileName);
 
-                // Start playing the selected song
                 audioPlayer.Ctlcontrols.play();
             }
         }
@@ -187,6 +230,50 @@ namespace Playlister
         private void PlayLister_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void ResizeListBox(ListBox listBox)
+        {
+            if (listBox.Items.Count == 0)
+            {
+                listBox.Height = 0;
+            }
+            else
+            {
+                int totalItemHeight = 0;
+                for (int i = 0; i < listBox.Items.Count; i++)
+                {
+                    totalItemHeight += listBox.GetItemHeight(i);
+                }
+                int borderHeight = listBox.Height - listBox.ClientSize.Height; // Account for the border height
+                listBox.Height = totalItemHeight + borderHeight;
+            }
+        }
+
+        private void Playlist_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+
+            if (e.Index >= 0)
+            {
+                // Calculate the new item rectangle with additional space below each item
+                Rectangle itemRect = new Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height - 5);
+
+                string songName = Path.GetFileNameWithoutExtension(Playlist.Items[e.Index].ToString());
+
+                using (Brush brush = new SolidBrush(e.ForeColor))
+                {
+                    e.Graphics.DrawString(songName, e.Font, brush, itemRect);
+                }
+            }
+
+            e.DrawFocusRectangle();
+        }
+
+        private void Playlist_MeasureItem(object sender, MeasureItemEventArgs e)
+        {
+            int spaceBelowItem = itemSpacing;
+            e.ItemHeight += spaceBelowItem;
         }
     }
 }

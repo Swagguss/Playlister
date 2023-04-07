@@ -79,8 +79,16 @@ namespace Playlister
                 Playlist.Items.Add(audio);
 
                 TextBox weightTextBox = new TextBox();
+<<<<<<< Updated upstream
                 weightTextBox.Text = "1"; // Set the initial weight to 1
                 weightTextBox.Location = new Point(Playlist.Location.X - Playlist.Width - 10, Playlist.Location.Y + i * (weightTextBox.Height + 2));
+=======
+                weightTextBox.Text = "1";
+                weightTextBox.Size = new Size(30, Playlist.ItemHeight); // Set a fixed size for the TextBox
+                weightTextBox.Location = new Point(5, i * (weightTextBox.Height + itemSpacing - 8)); // Add some margin between TextBoxes
+                weightTextBox.Parent = weightPanel;
+                weightTextBox.Font = new Font("Nirmala UI", 7, FontStyle.Bold); // Set the font to Nirmala UI Bold with a size of 7
+>>>>>>> Stashed changes
                 weightTextBox.TextChanged += WeightTextBox_TextChanged;
                 weightTextBox.Tag = i; // Store the index of the song in the Tag property
                 this.Controls.Add(weightTextBox);

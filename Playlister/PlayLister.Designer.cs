@@ -39,15 +39,15 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.audioPlayer = new AxWMPLib.AxWindowsMediaPlayer();
             this.FileName = new System.Windows.Forms.Label();
             this.lblDuration = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.weightPanel = new System.Windows.Forms.Panel();
             this.Playlist = new System.Windows.Forms.ListBox();
+            this.audioPlayer = new AxWMPLib.AxWindowsMediaPlayer();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.audioPlayer)).BeginInit();
             this.weightPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.audioPlayer)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -73,14 +73,16 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.saveToolStripMenuItem.Text = "Save (not implemented)";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.loadToolStripMenuItem.Text = "Load (not implemented)";
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadToolStripMenuItem.Text = "Load";
+            this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadPlaylistToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
@@ -110,17 +112,6 @@
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(32, 19);
-            // 
-            // audioPlayer
-            // 
-            this.audioPlayer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.audioPlayer.Enabled = true;
-            this.audioPlayer.Location = new System.Drawing.Point(0, 398);
-            this.audioPlayer.Name = "audioPlayer";
-            this.audioPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("audioPlayer.OcxState")));
-            this.audioPlayer.Size = new System.Drawing.Size(605, 46);
-            this.audioPlayer.TabIndex = 1;
-            this.audioPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.MediaPlayerStateChangeEvent);
             // 
             // FileName
             // 
@@ -179,6 +170,17 @@
             this.Playlist.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.Playlist_MeasureItem);
             this.Playlist.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.PickSongWithDoubleClick);
             // 
+            // audioPlayer
+            // 
+            this.audioPlayer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.audioPlayer.Enabled = true;
+            this.audioPlayer.Location = new System.Drawing.Point(0, 398);
+            this.audioPlayer.Name = "audioPlayer";
+            this.audioPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("audioPlayer.OcxState")));
+            this.audioPlayer.Size = new System.Drawing.Size(605, 46);
+            this.audioPlayer.TabIndex = 1;
+            this.audioPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.MediaPlayerStateChangeEvent);
+            // 
             // PlayLister
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(58)))), ((int)(((byte)(75)))));
@@ -198,8 +200,8 @@
             this.Load += new System.EventHandler(this.PlayLister_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.audioPlayer)).EndInit();
             this.weightPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.audioPlayer)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

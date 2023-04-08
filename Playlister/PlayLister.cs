@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using Newtonsoft.Json;
 using System.IO;
 
 namespace Playlister
@@ -27,7 +28,11 @@ namespace Playlister
         {
             InitializeComponent();
         }
-
+        public class PlaylistData
+        {
+            public List<string> FilteredFiles { get; set; }
+            public List<int> SongWeights { get; set; }
+        }
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -69,7 +74,6 @@ namespace Playlister
 
         private void LoadPlaylist()
         {
-
             audioPlayer.currentPlaylist = audioPlayer.newPlaylist("Playlist", "");
             int i = 0;
             foreach (string audio in filteredFiles)
@@ -78,16 +82,25 @@ namespace Playlister
                 Playlist.Items.Add(audio);
 
                 TextBox weightTextBox = new TextBox();
-                weightTextBox.Text = "1";
                 weightTextBox.Size = new Size(30, Playlist.ItemHeight); // Set a fixed size for the TextBox
-                weightTextBox.Location = new Point(5, i * (weightTextBox.Height+itemSpacing-8)); // Add some margin between TextBoxes
+                weightTextBox.Location = new Point(5, i * (weightTextBox.Height + itemSpacing - 8)); // Add some margin between TextBoxes
                 weightTextBox.Parent = weightPanel;
                 weightTextBox.Font = new Font("Nirmala UI", 7, FontStyle.Bold); // Set the font to Nirmala UI Bold with a size of 7
                 weightTextBox.TextChanged += WeightTextBox_TextChanged;
                 weightTextBox.Tag = i;
-                weightTextBoxes.Add(weightTextBox);
 
-                songWeights.Add(1); // Initialize the song weights list
+                if (songWeights.Count > i) // Check if there is a corresponding weight in the songWeights list
+                {
+                    weightTextBox.Text = songWeights[i].ToString();
+                }
+                else
+                {
+                    // If there's no corresponding weight, default to 1 and add it to the list
+                    weightTextBox.Text = "1";
+                    songWeights.Add(1);
+                }
+
+                weightTextBoxes.Add(weightTextBox);
 
                 i++;
             }
@@ -106,7 +119,6 @@ namespace Playlister
             {
                 MessageBox.Show("No Audio files found in this folder.");
             }
-
         }
 
         private void WeightTextBox_TextChanged(object sender, EventArgs e)
@@ -274,6 +286,65 @@ namespace Playlister
         {
             int spaceBelowItem = itemSpacing;
             e.ItemHeight += spaceBelowItem;
+        }
+
+        private void SavePlaylist(string filePath)
+        {
+            var playlistData = new PlaylistData
+            {
+                FilteredFiles = filteredFiles,
+                SongWeights = songWeights
+            };
+
+            string json = JsonConvert.SerializeObject(playlistData, Formatting.Indented);
+            File.WriteAllText(filePath, json);
+        }
+
+        private void LoadPlaylistButtonEvent(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show("Playlist file not found.");
+                return;
+            }
+
+            string json = File.ReadAllText(filePath);
+            var playlistData = JsonConvert.DeserializeObject<PlaylistData>(json);
+
+            filteredFiles = playlistData.FilteredFiles;
+            songWeights = playlistData.SongWeights;
+
+            // Call your existing LoadPlaylist method here, which populates the UI
+            LoadPlaylist();
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "JSON files (*.json)|*.json";
+            saveFileDialog.InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Playlists");
+
+            if (!Directory.Exists(saveFileDialog.InitialDirectory))
+            {
+                Directory.CreateDirectory(saveFileDialog.InitialDirectory);
+            }
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                SavePlaylist(saveFileDialog.FileName);
+            }
+        }
+
+        private void loadPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "JSON files (*.json)|*.json";
+            openFileDialog.InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Playlists");
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                LoadPlaylistButtonEvent(openFileDialog.FileName);
+            }
         }
     }
 }
